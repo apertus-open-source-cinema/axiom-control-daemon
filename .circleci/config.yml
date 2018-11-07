@@ -1,0 +1,10 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: base/archlinux
+    steps:
+      - checkout
+      - run:
+        name: Install required packages
+        command: pacman -Sy cmake z openssl

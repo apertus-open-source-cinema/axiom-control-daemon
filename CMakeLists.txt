@@ -70,6 +70,7 @@ FILE(COPY ${CMAKE_SOURCE_DIR}/systemd/ DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
 ExternalProject_Add(uWebSockets
     GIT_REPOSITORY "https://github.com/uNetworking/uWebSockets.git"
+    GIT_TAG "v0.14"
     INSTALL_COMMAND ""
     UPDATE_COMMAND ""
     CONFIGURE_COMMAND ""

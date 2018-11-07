@@ -68,23 +68,8 @@ ADD_CUSTOM_TARGET(flatc_cpp_gen
 # Copy systemd description files
 FILE(COPY ${CMAKE_SOURCE_DIR}/systemd/ DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
-ExternalProject_Add(uWebSockets
-    GIT_REPOSITORY "https://github.com/uNetworking/uWebSockets.git"
-    GIT_TAG "v0.14"
-    INSTALL_COMMAND ""
-    UPDATE_COMMAND ""
-    CONFIGURE_COMMAND ""
-    BUILD_COMMAND make
-    BUILD_IN_SOURCE ON
-    LOG_DOWNLOAD ON)
-
-ExternalProject_Get_Property(uWebSockets SOURCE_DIR)
-MESSAGE(STATUS "uWebSockets DIR: ${SOURCE_DIR}")
-MESSAGE(STATUS "uWebSockets SRC_DIR: ${SOURCE_DIR}/src")
-
 # Used for loading generated headers, e.g. #include <Schema/axiom_daemon_generated.h>
 INCLUDE_DIRECTORIES(${SOURCE_DIR}/src/)
-
 
 # Client example should be build separately for now
 ADD_SUBDIRECTORY(API_WS)
@@ -92,7 +77,7 @@ ADD_SUBDIRECTORY(CLI)
 #ADD_SUBDIRECTORY(${PROJECT_SOURCE_DIR}/GoAPI/)
 
 # Catch2 (unit test framework)
-INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/3rdParty/)
+INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/../3rdParty/)
 
 # Unit tests 
 #ADD_SUBDIRECTORY(${PROJECT_SOURCE_DIR}/UnitTests/)
@@ -104,29 +89,3 @@ ADD_EXECUTABLE(${PROJECT_NAME} ${SOURCE_FILES})
 ADD_DEPENDENCIES(${PROJECT_NAME} flatc_cpp_gen)
 
 TARGET_LINK_LIBRARIES(${PROJECT_NAME} systemd)
-
-find_program(
-  CLANG_TIDY_EXE
-  NAMES "clang-tidy"
-  DOC "Path to clang-tidy executable"
-  )
-if(NOT CLANG_TIDY_EXE)
-  message(STATUS "clang-tidy not found.")
-else()
-  message(STATUS "clang-tidy found: ${CLANG_TIDY_EXE}")
-  set(DO_CLANG_TIDY "${CLANG_TIDY_EXE}" "-checks=*,-clang-analyzer-alpha.*")
-endif()
-
-set_target_properties(
-  ${PROJECT_NAME} PROPERTIES
-  CXX_STANDARD 11
-  CXX_STANDARD_REQUIRED ON
-  COMPILE_FLAGS "${WARNING_FLAGS}"
-)
-
-if(CLANG_TIDY_EXE)
-  set_target_properties(
-    ${PROJECT_NAME} PROPERTIES
-    CXX_CLANG_TIDY "${DO_CLANG_TIDY}"
-  )
-endif()

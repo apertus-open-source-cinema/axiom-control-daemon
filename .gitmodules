@@ -1,3 +1,4 @@
 [submodule "3rdParty/uWebSockets"]
 	path = 3rdParty/uWebSockets
 	url = https://github.com/uNetworking/uWebSockets.git
+	branch = v0.14

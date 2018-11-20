@@ -24,12 +24,16 @@
 TEST_CASE( "Gain setting", "[CMV12000Adapter]" ) 
 {
     CMV12000AdapterClass adapter;
-    CHECK( adapter.SetParameter("gain", 3) == true );
-    REQUIRE( adapter.GetParameter("gain") == 3 );
+    std::string message = "";
+    std::string parameterValue = "3";
+    CHECK( adapter.HandleParameter("set_gain", parameterValue, message) == true );
+    REQUIRE( adapter.HandleParameter("get_gain", parameterValue, message) == true );
 }
 
 TEST_CASE( "Dummy parameter test, test should succeed if SetParameter() returns false (no handler found)", "[CMV12000Adapter]" ) 
 {
     CMV12000AdapterClass adapter;
-    REQUIRE( adapter.SetParameter("dummyParameter", 3) == false );
+    std::string message = "";
+    std::string parameterValue = "3";
+    REQUIRE( adapter.HandleParameter("dummyParameter", parameterValue, message) == false );
 }

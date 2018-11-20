@@ -1,5 +1,7 @@
 #include <catch/catch.hpp>
 
+#include <iostream>
+
 #include "../API_WS/MessageHandler.h"
 
 TEST_CASE( "Process message", "[MessageHandler]" ) 
@@ -12,6 +14,8 @@ TEST_CASE( "Process message", "[MessageHandler]" )
 
     std::string responseMessage;
     bool status = messageHandler->ProcessMessage(inputData, responseMessage);
+
+    INFO("Response message: " + responseMessage);
 
     REQUIRE( status == true );
     REQUIRE( responseMessage == expectedData );

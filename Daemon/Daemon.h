@@ -44,12 +44,13 @@ class Daemon
 
     void SetupSocket();
 
-    void RetrieveIncomingData(int socket, uint8_t* receivedBuffer, unsigned int bufferSize);
+    int RetrieveIncomingData(int socket, uint8_t* receivedBuffer, unsigned int bufferSize);
 
     void ProcessReceivedData(uint8_t* receivedBuffer);
 
     bool ProcessGeneralRequest(std::unique_ptr<DaemonRequestT> &req);
 
+    void ProcessClient(int socket);
 public:
     Daemon();
 

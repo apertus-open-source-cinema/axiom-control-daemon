@@ -3,6 +3,7 @@
 #include <chrono>
 #include <iomanip>
 #include <sstream>
+#include <thread>
 
 std::string GetCurrentTimestamp()
 {
@@ -74,35 +75,58 @@ void Daemon::Start()
 
 void Daemon::Process()
 {
-    uint8_t* receivedBuffer = new uint8_t[1024];
-
     unsigned int addrlen = sizeof (_socketDesc);
-    int new_socket = accept (_socketDesc, reinterpret_cast<struct sockaddr*>(&new_socket), &addrlen);
+    
+    //std::thread t(&Daemon::ProcessClient, this, std::placeholders::_1);
+
     while(_running)
     {
+        std::cout << "Waiting for client to connect" << std::endl;
         // TODO (BAndiT1983): Add handling of multiple clients, e.g. each processing in new thread, also check thread-safety of STL vector, to place requests in a queue
+        int new_socket = accept (_socketDesc, reinterpret_cast<struct sockaddr*>(&new_socket), &addrlen);
+        std::cout << "Socket (loop): " << new_socket << std::endl;
 
-        if(new_socket < 0)
+        if(new_socket)
         {
-            printf("ACCEPT ERROR = %s\n", strerror(errno));
-            close(_socketDesc);
-            exit(1);
-        }
-
-        // Wait for packets to arrive
-        RetrieveIncomingData(new_socket, receivedBuffer, 1024);
-
-        ProcessReceivedData(receivedBuffer);
-
-        ssize_t error = send(new_socket, _builder.GetBufferPointer(), _builder.GetSize(), 0);
-        if(error < 0)
-        {
-            std::cout << "Error while sending response." << std::endl;
-            printf("SEND ERROR = %s\n", strerror(errno));
+            std::thread t(&Daemon::ProcessClient, this, new_socket);
+            t.join();
         }
 
         //close(new_socket);
     }
+}
+
+void Daemon::ProcessClient(int socket)
+{
+        uint8_t* receivedBuffer = new uint8_t[1024];
+        std::cout << "NEW CLIENT" << std::endl;
+        std::cout << "Socket: " << socket << std::endl;
+
+        while(1)
+        {
+            if(socket < 0)
+            {
+                printf("ACCEPT ERROR = %s\n", strerror(errno));
+                return;
+            }
+
+            // Wait for packets to arrive
+            int size = RetrieveIncomingData(socket, receivedBuffer, 1024);
+            if(size <= 0)
+            {
+                return;
+            }
+
+            std::cout << "Received buffer size: " << receivedBuffer << std::endl;
+            ProcessReceivedData(receivedBuffer);
+
+            ssize_t error = send(socket, _builder.GetBufferPointer(), _builder.GetSize(), 0);
+            if(error < 0)
+            {
+                std::cout << "Error while sending response." << std::endl;
+                printf("SEND ERROR = %s\n", strerror(errno));
+            }
+        }    
 }
 
 void Daemon::ProcessReceivedData(uint8_t* receivedBuffer)
@@ -113,10 +137,7 @@ void Daemon::ProcessReceivedData(uint8_t* receivedBuffer)
 
     if(moduleName == "general")
     {
-        bool result = ProcessGeneralRequest(req);
-
-        req.get()->status = result == true ? "success" : "fail";
-        req.get()->timestamp = GetCurrentTimestamp();
+        ProcessGeneralRequest(req);
 
         _builder.Finish(CreateDaemonRequest(_builder, req.get()));
 
@@ -149,11 +170,19 @@ void Daemon::ProcessReceivedData(uint8_t* receivedBuffer)
 
 bool Daemon::ProcessGeneralRequest(std::unique_ptr<DaemonRequestT> &req)
 {
+    bool result = false;
+    req.get()->status = "fail";
+
     if(req.get()->command == "get_available_methods")
     {
         req.get()->message = "Available Methods: NONE";
-        return true;
+        req.get()->status = "success";
+        req.get()->timestamp = GetCurrentTimestamp();
+
+        result = true;
     }
+
+    return result;
 }
 
 void Daemon::SetupSocket()
@@ -182,17 +211,13 @@ void Daemon::SetupSocket()
     listen(_socketDesc, 5);
 }
 
-void Daemon::RetrieveIncomingData(int socket, uint8_t* receivedBuffer, unsigned int bufferSize)
+int Daemon::RetrieveIncomingData(int socket, uint8_t* receivedBuffer, unsigned int bufferSize)
 {
     ssize_t size = recv(socket, receivedBuffer, size, 0);
     if(size < 0)
     {
         printf("RECV ERROR = %s\n", strerror(errno));
-        close(_socketDesc);
-        exit(1);
     }
-    else if(size == 0)
-    {
-        exit(0);
-    }
+            
+    return size;
 }

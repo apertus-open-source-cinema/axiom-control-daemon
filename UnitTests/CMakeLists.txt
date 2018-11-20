@@ -14,6 +14,8 @@ ENDIF(ENABLE_MOCK)
 
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/..)
 
+INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/../3rdParty/)
+
 # Used for loading generated headers, e.g. #include <Schema/axiom_daemon_generated.h>
 INCLUDE_DIRECTORIES(${CMAKE_BINARY_DIR}/src/)
 

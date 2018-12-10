@@ -213,9 +213,10 @@ void Daemon::SetupSocket()
 
 int Daemon::RetrieveIncomingData(int socket, uint8_t* receivedBuffer, unsigned int bufferSize)
 {
-    ssize_t size = recv(socket, receivedBuffer, size, 0);
+    ssize_t size = recv(socket, receivedBuffer, bufferSize, 0);
     if(size < 0)
     {
+        printf("Received data size: %s\n", std::to_string(size));
         printf("RECV ERROR = %s\n", strerror(errno));
     }
             

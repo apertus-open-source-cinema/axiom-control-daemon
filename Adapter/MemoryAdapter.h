@@ -22,41 +22,41 @@ protected:
     uintptr_t baseAddress;
 
 public:
-    void ReadDescriptions(std::string descriptionFile)
+    void ReadDescriptions(std::string descriptionFile) override
     {
         UNUSED(descriptionFile);
     }
 
-    void CheckDevices() {}
+    void CheckDevices()  override {}
 
-    void ReadByte(uint8_t data)
+    void ReadByte(uint8_t data)  override
     {
         UNUSED(data);
     }
-    void WriteByte(uint8_t data)
+    void WriteByte(uint8_t data)  override
     {
         UNUSED(data);
     }
 
-    void WriteWord(unsigned reg, uint16_t val)
+    virtual void WriteWord(unsigned reg, uint16_t val)
     {
-        volatile uint32_t* ptr = (uint32_t*)baseAddress;
+        volatile uint32_t* ptr = reinterpret_cast<uint32_t*>(baseAddress);
         ptr[reg] = val;
     }
     
-    void ReadBlock(uint8_t *data, unsigned int length)
+    void ReadBlock(uint8_t *data, unsigned int length) override
     {
         UNUSED(data);
         UNUSED(length);
     }
 
-    void WriteBlock(uint8_t *data, unsigned int length)
+    void WriteBlock(uint8_t *data, unsigned int length) override
     {
         UNUSED(data);
         UNUSED(length);
     }
 
-    void* MemoryMap(uintptr_t address, uint32_t size)
+    virtual void* MemoryMap(uintptr_t address, uint32_t size)
     {
         baseAddress = address;
 
@@ -73,7 +73,6 @@ public:
 
         void* result = nullptr;
         
-#ifndef ENABLE_MOCK
         result = mmap(reinterpret_cast<void*>(address), size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, address);
         if(result == reinterpret_cast<void*>(-1))
         {
@@ -83,17 +82,16 @@ public:
         }
 
         baseAddress = reinterpret_cast<uintptr_t>(result);
-#endif
 
         return result;
     }
 
-    int MemoryUnmap(uint32_t address, uint32_t size)
+    virtual int MemoryUnmap(uint32_t address, uint32_t size)
     {
         return munmap(reinterpret_cast<void*>(address), size);
     }
 
-    virtual void Execute()
+    virtual void Execute() override
     {
 
     }

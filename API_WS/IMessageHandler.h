@@ -7,8 +7,7 @@
 class IMessageHandler
 {
 public:
-    IMessageHandler() {}
-    virtual ~IMessageHandler() {}
+    virtual ~IMessageHandler() = default;
 
     // Process JSON message and return response
     virtual bool ProcessMessage(std::string message, std::string& response) = 0;

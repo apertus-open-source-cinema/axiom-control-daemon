@@ -111,7 +111,7 @@ void Daemon::ProcessClient(int socket)
             }
 
             // Wait for packets to arrive
-            int size = RetrieveIncomingData(socket, receivedBuffer, 1024);
+            ssize_t size = RetrieveIncomingData(socket, receivedBuffer, 1024);
             if(size <= 0)
             {
                 return;
@@ -159,7 +159,7 @@ void Daemon::ProcessReceivedData(uint8_t* receivedBuffer)
 
     std::string value = req->value;
 
-    bool result = module->HandleParameter(req->command, req.get()->value, req.get()->message);
+    bool result = module->HandleParameter(req->command, req->parameter, req.get()->value, req.get()->message);
 
     // TODO (BAndiT1983):Check if assignments are really required, or if it's suitable of just passing reference to req attirbutes
     req.get()->status = result == true ? "success" : "fail";
@@ -200,7 +200,7 @@ void Daemon::SetupSocket()
     _name.sun_family = AF_LOCAL;
     strcpy(_name.sun_path, _socketPath.c_str());
 
-    int result = bind(_socketDesc, (struct sockaddr*) &_name, sizeof(_name));
+    int result = bind(_socketDesc, reinterpret_cast<struct sockaddr*>(&_name), sizeof(_name));
     if (result < 0)
     {
         _statusMessage = "Bind failed: " + std::string(strerror(errno));
@@ -211,12 +211,12 @@ void Daemon::SetupSocket()
     listen(_socketDesc, 5);
 }
 
-int Daemon::RetrieveIncomingData(int socket, uint8_t* receivedBuffer, unsigned int bufferSize)
+ssize_t Daemon::RetrieveIncomingData(int socket, uint8_t* receivedBuffer, unsigned int bufferSize)
 {
     ssize_t size = recv(socket, receivedBuffer, bufferSize, 0);
     if(size < 0)
     {
-        printf("Received data size: %s\n", std::to_string(size));
+        printf("Received data size: %ld\n", size);
         printf("RECV ERROR = %s\n", strerror(errno));
     }
             

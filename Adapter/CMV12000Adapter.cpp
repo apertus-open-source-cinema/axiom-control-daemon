@@ -1,10 +1,19 @@
 #include "CMV12000Adapter.h"
 
+#include "MemoryAdapterDummy.h"
+
+#ifdef ENABLE_MOCK
+using MemAdapter = MemoryAdapterDummy;
+#else
+using MemAdapter = MemoryAdapter;
+#endif
+
+
 CMV12000Adapter::CMV12000Adapter() :
     address(0x60000000),
-    memorySize(0x00020000)
+    memorySize(0x00020000),
+    _memoryAdapter(std::make_shared<MemAdapter>())
 {
-    _memoryAdapter = std::make_shared<MemoryAdapter>();
     // Map the regions at start, to prevent repeating calls of mmap()
     _memoryAdapter->MemoryMap(address, memorySize);
 
@@ -16,8 +25,10 @@ void CMV12000Adapter::RegisterAvailableMethods()
     //RegisterMethods("set_gain", std::bind(&CMV12000Adapter::SetGain, this, std::placeholders::_1));
 
     // TODO: Add macros to simplify registering of getter and setter, e.g. GETTER_FUNC(CMV12000Adapter, GetGain)
-    AddParameterHandler("gain", std::bind(&CMV12000Adapter::GetGain, this, std::placeholders::_1, std::placeholders::_2),
-                        std::bind(&CMV12000Adapter::SetGain, this, std::placeholders::_1, std::placeholders::_2));
+    AddParameterHandler("analog_gain", std::bind(&CMV12000Adapter::GetAnalogGain, this, std::placeholders::_1, std::placeholders::_2),
+                        std::bind(&CMV12000Adapter::SetAnalogGain, this, std::placeholders::_1, std::placeholders::_2));
+    AddParameterHandler("digital_gain", std::bind(&CMV12000Adapter::GetDigitalGain, this, std::placeholders::_1, std::placeholders::_2),
+                        std::bind(&CMV12000Adapter::SetDigitalGain, this, std::placeholders::_1, std::placeholders::_2));
 }
 
 CMV12000Adapter::~CMV12000Adapter()
@@ -25,59 +36,70 @@ CMV12000Adapter::~CMV12000Adapter()
     _memoryAdapter->MemoryUnmap(address, memorySize);
 }
 
-bool CMV12000Adapter::SetGain(std::string gainValue, std::string& message)
+bool CMV12000Adapter::SetAnalogGain(std::string gainValue, std::string& message)
 {
-    message = "SetGain() | Value: " + gainValue;
-    JournalLogger::Log(message);
-
     if(gainValue.length() > 1)
     {
         message = "SetGain() | Gain out of range 0 -> 4";
         return false;
     }
 
-    int gainIndex = stoi(gainValue);
-    // TODO: Add handling of 3/3 gain value
-    if(gainIndex < 0 || gainIndex > 4)
+    _analogGainValue = static_cast<unsigned int>(stoi(gainValue));
+    if(_analogGainValue > 7)
     {
         // TODO: Log error for unsuitable parameter
-        message = "SetGain() | Gain out of range 0 -> 4";
+        message = "SetAnalogGain() | Gain index out of range 0 -> 7";
         return false;
     }
 
-
-    // TODO: Replace script code, extracted from set_gain.sh
-    //cmv_reg 115 $GAIN      # gain
-    //cmv_reg 116 $ADC_RANGE # ADC_range fine-tuned for each gain
-    //cmv_reg 100 1          # ADC_range_mult2
-    //cmv_reg 87 2000        # offset 1
-    //cmv_reg 88 2000        # offset 2
-
-    SetConfigRegister(115, _gain[gainIndex]);
-    SetConfigRegister(116, _adcRAnge[gainIndex]);
-    SetConfigRegister(100, 1);
-    SetConfigRegister(87, 2000);
-    SetConfigRegister(88, 2000);
+    // Set division first, to prevent overwriting gain values
+    SetConfigRegister(115, _divPGA[_analogGainValue]);
+    SetConfigRegister(115, _gainPGA[_analogGainValue]);
+    //    SetConfigRegister(100, 1);
+    //    SetConfigRegister(87, 2000);
+    //    SetConfigRegister(88, 2000);
 
     return true;
 }
 
-bool CMV12000Adapter::GetGain(std::string& gainValue, std::string& message)
+bool CMV12000Adapter::GetAnalogGain(std::string& gainValue, std::string& message)
 {
-    gainValue = 2;
+    UNUSED(message);
+
+    gainValue = std::to_string(_analogGainValue);
     return true;
 }
 
-// CAUTION: Deactivated this method for now, as the development/testing is done on PC and this would constantly result in SEGFAULT (or similar)
+bool CMV12000Adapter::SetDigitalGain(std::string gainValue, std::string &message)
+{
+    _digitalGainValue = static_cast<unsigned int>(stoi(gainValue));
+    // TODO: Add handling of 3/3 gain value
+    if(_digitalGainValue > 9)
+    {
+        // TODO: Log error for unsuitable parameter
+        message = "SetDigitalgGain() | Gain index out of range 0 -> 9";
+        return false;
+    }
+
+    SetConfigRegister(117, _digitalGainValues[_digitalGainValue]);
+
+    return true;
+}
+
+bool CMV12000Adapter::GetDigitalGain(std::string &gainValue, std::string &message)
+{
+    UNUSED(message);
+
+    gainValue = std::to_string(_digitalGainValue);
+    return true;
+}
+
 void CMV12000Adapter::SetConfigRegister(u_int8_t registerIndex, unsigned int value)
 {
-    // TODO: Add implementation
     std::string message = "SetConfigRegister() - Register: " + std::to_string(registerIndex) + " | Value: " + std::to_string(value);
     JournalLogger::Log(message);
 
-#ifndef ENABLE_MOCK
     _memoryAdapter->WriteWord(registerIndex, value);
-#endif
 }
 
 void CMV12000Adapter::Execute()
@@ -101,10 +123,3 @@ void CMV12000Adapter::Execute()
 //        return handler.Getter(*this);
 //    }
 //}
-
-bool CMV12000Adapter::TestMethod(std::string& value)
-{
-    int val = std::stoi(value);
-    val += 4;
-    return true;
-}

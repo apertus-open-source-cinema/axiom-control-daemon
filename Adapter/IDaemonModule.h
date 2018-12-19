@@ -75,10 +75,10 @@ public:
 
     //virtual std::vector<std::string>GetAvailableMethods() = 0;
 
-    bool HandleParameter(std::string parameterName, std::string& parameterValue, std::string& message)
+    bool HandleParameter(std::string command, std::string parameterName, std::string& parameterValue, std::string& message)
     {
         std::string originalParameterName = parameterName;
-        std::unordered_map<std::string, ParameterHandler>::const_iterator got = parameterHandlers.find (parameterName.erase(0, 4));
+        std::unordered_map<std::string, ParameterHandler>::const_iterator got = parameterHandlers.find (parameterName);
         if ( got == parameterHandlers.end() )
         {
             JournalLogger::Log("Handler not found");
@@ -90,8 +90,7 @@ public:
             JournalLogger::Log("Handler found");
 
             auto handler = got->second;
-            // TODO: Maybe replace prefixes with separate command attribute in request (JSON)
-            auto method = (originalParameterName.find("set_") == 0) ? handler.Setter : handler.Getter;
+            auto method = (command == "set") ? handler.Setter : handler.Getter;
 
             return method(parameterValue, message);
         }

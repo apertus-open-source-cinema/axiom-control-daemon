@@ -44,7 +44,7 @@ class Daemon
 
     void SetupSocket();
 
-    int RetrieveIncomingData(int socket, uint8_t* receivedBuffer, unsigned int bufferSize);
+    ssize_t RetrieveIncomingData(int socket, uint8_t* receivedBuffer, unsigned int bufferSize);
 
     void ProcessReceivedData(uint8_t* receivedBuffer);
 

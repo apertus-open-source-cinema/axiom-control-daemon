@@ -17,7 +17,7 @@ class WSServer
     std::shared_ptr<IMessageHandler> _messageHandler;
 
 public:
-    WSServer(int port);
+    explicit WSServer(int port);
     ~WSServer();
 
     void Start();

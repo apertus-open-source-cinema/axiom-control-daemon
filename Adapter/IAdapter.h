@@ -7,8 +7,7 @@
 class IAdapter
 {
 public:
-    // TODO: Move definition outside to remove vtable warnings
-    virtual ~IAdapter() {}
+    virtual ~IAdapter();
 
     // TODO: Exposed it for tests, later it should reviewed again
     virtual void ReadDescriptions(std::string descriptionFile) = 0;

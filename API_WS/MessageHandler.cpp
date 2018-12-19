@@ -14,6 +14,7 @@ namespace ns
         std::string sender;
         std::string module;
         std::string command;
+        std::string parameter;
         std::string value;
         std::string status;
         std::string message;
@@ -25,6 +26,7 @@ namespace ns
         j = json{{"sender", setting.sender},
                  {"module", setting.module},
                  {"command", setting.command},
+                 {"parameter", setting.parameter},
                  {"value", setting.value},
                  {"status", setting.status},
                  {"message", setting.message},
@@ -36,6 +38,7 @@ namespace ns
         s.sender = j.at("sender").get<std::string>();
         s.module = j.at("module").get<std::string>();
         s.command = j.at("command").get<std::string>();
+        s.parameter = j.at("parameter").get<std::string>();
         s.value = j.at("value").get<std::string>();
         s.status = j.at("status").get<std::string>();
         s.message = j.at("message").get<std::string>();
@@ -45,6 +48,8 @@ namespace ns
 
 MessageHandler::MessageHandler() : 
     socketPath("/tmp/axiom_daemon.uds"),
+    _sockaddrLength(sizeof(struct sockaddr_un)),
+    _response(""),
     _builder(new flatbuffers::FlatBufferBuilder())
 {
     SetupSocket();
@@ -68,7 +73,7 @@ bool MessageHandler::ProcessMessage(std::string message, std::string& response)
         return false;
     }
 
-    AddDaemonRequest(setting.sender, setting.module, setting.command, setting.value);
+    AddDaemonRequest(setting.sender, setting.module, setting.command, setting.parameter, setting.value);
     std::unique_ptr<DaemonRequestT> req;
     TransferData(req);
 
@@ -88,8 +93,6 @@ void MessageHandler::Execute()
     // TODO: Implement packet to trigger applying/retrieving of settings sent to daemon
 }
 
-socklen_t len = sizeof(struct sockaddr_un);
-
 void MessageHandler::TransferData(std::unique_ptr<DaemonRequestT>& req)
 {
     std::cout << "TransferData() started" << std::endl;
@@ -98,8 +101,8 @@ void MessageHandler::TransferData(std::unique_ptr<DaemonRequestT>& req)
     
     //send(clientSocket, _builder->GetBufferPointer(), _builder->GetSize(), 0);
 
-    sendto(clientSocket, _builder->GetBufferPointer(), _builder->GetSize(), 0, reinterpret_cast<struct sockaddr*>(&address), len);
-    ssize_t i = recvfrom(clientSocket, &response, 1023, 0, reinterpret_cast<struct sockaddr*>(&address), &len);
+    sendto(clientSocket, _builder->GetBufferPointer(), _builder->GetSize(), 0, reinterpret_cast<struct sockaddr*>(&address), _sockaddrLength);
+    ssize_t i = recvfrom(clientSocket, &_response, 1023, 0, reinterpret_cast<struct sockaddr*>(&address), &_sockaddrLength);
     if(i < 0)
     {
         std::cout << "RECEIVE ERROR: " << strerror(errno) << std::endl;
@@ -109,7 +112,7 @@ void MessageHandler::TransferData(std::unique_ptr<DaemonRequestT>& req)
     }
 
 
-    req = UnPackDaemonRequest(response);//DaemonRequest::UnPack(req, receivedBuffer);
+    req = UnPackDaemonRequest(_response);//DaemonRequest::UnPack(req, receivedBuffer);
     std::cout << "RESPONSE MESSAGE: " << req.get()->status << std::endl;
 
     std::string message = "Data size: " + std::to_string(_builder->GetSize());
@@ -140,12 +143,13 @@ void MessageHandler::SetupSocket()
     }
 }
 
-void MessageHandler::AddDaemonRequest(std::string sender, std::string module, std::string command, std::string value)
+void MessageHandler::AddDaemonRequest(const std::string& sender, const std::string& module, const std::string& command, const std::string& parameter, const std::string& value)
 {
     DaemonRequestT request;
     request.sender = sender;
     request.module_ = module;
     request.command = command;
+    request.parameter = parameter;
     request.value = value;
 
     auto req = CreateDaemonRequest(*_builder, &request);

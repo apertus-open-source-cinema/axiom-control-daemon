@@ -19,9 +19,10 @@ class MessageHandler : public IMessageHandler
     std::string socketPath;
     int clientSocket;
     struct sockaddr_un address;
+    socklen_t _sockaddrLength;
 
     // TODO (BAndiT1983): Rework, possibly shrink it, as the data is much smaller currently
-    char response[1024];
+    char _response[1024];
     
     // Using separate lists for now as it seems that flatbuffers does not use inheritance for unions
     std::vector<flatbuffers::Offset<DaemonRequest>> _settings;
@@ -42,7 +43,7 @@ public:
     void Execute();
     void TransferData(std::unique_ptr<DaemonRequestT>& req);
 
-    void AddDaemonRequest(std::string sender, std::string module, std::string command, std::string value);
+    void AddDaemonRequest(const std::string& sender, const std::string& module, const std::string& command, const std::string &parameter, const std::string& value);
 
     void OutputReceivedData(ns::JSONSetting setting, std::string& message);
 };

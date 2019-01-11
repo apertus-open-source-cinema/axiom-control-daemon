@@ -15,7 +15,8 @@ namespace ns
         std::string module;
         std::string command;
         std::string parameter;
-        std::string value;
+        std::string value1;
+        std::string value2;
         std::string status;
         std::string message;
         std::string timestamp;
@@ -27,7 +28,8 @@ namespace ns
                  {"module", setting.module},
                  {"command", setting.command},
                  {"parameter", setting.parameter},
-                 {"value", setting.value},
+                 {"value1", setting.value1},
+                 {"value2", setting.value2},
                  {"status", setting.status},
                  {"message", setting.message},
                  {"timestamp", setting.timestamp}};
@@ -39,7 +41,8 @@ namespace ns
         s.module = j.at("module").get<std::string>();
         s.command = j.at("command").get<std::string>();
         s.parameter = j.at("parameter").get<std::string>();
-        s.value = j.at("value").get<std::string>();
+        s.value1 = j.at("value1").get<std::string>();
+        s.value2 = j.at("value2").get<std::string>();
         s.status = j.at("status").get<std::string>();
         s.message = j.at("message").get<std::string>();
         s.timestamp = j.at("timestamp").get<std::string>();
@@ -73,11 +76,12 @@ bool MessageHandler::ProcessMessage(std::string message, std::string& response)
         return false;
     }
 
-    AddDaemonRequest(setting.sender, setting.module, setting.command, setting.parameter, setting.value);
+    AddDaemonRequest(setting.sender, setting.module, setting.command, setting.parameter, setting.value1, setting.value2);
     std::unique_ptr<DaemonRequestT> req;
     TransferData(req);
 
-    setting.value = req.get()->value;
+    setting.value1 = req.get()->value1;
+    setting.value2 = req.get()->value2;
     setting.message = req.get()->message;
     setting.status = req.get()->status;
     //setting.timestamp = req.get()->timestamp;
@@ -143,14 +147,15 @@ void MessageHandler::SetupSocket()
     }
 }
 
-void MessageHandler::AddDaemonRequest(const std::string& sender, const std::string& module, const std::string& command, const std::string& parameter, const std::string& value)
+void MessageHandler::AddDaemonRequest(const std::string& sender, const std::string& module, const std::string& command, const std::string& parameter, const std::string& value1, const std::string& value2)
 {
     DaemonRequestT request;
     request.sender = sender;
     request.module_ = module;
     request.command = command;
     request.parameter = parameter;
-    request.value = value;
+    request.value1 = value1;
+    request.value2 = value2;
 
     auto req = CreateDaemonRequest(*_builder, &request);
     _settings.push_back(req);

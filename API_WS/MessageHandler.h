@@ -11,7 +11,7 @@
 
 namespace ns
 {
-    struct JSONSetting;
+struct JSONSetting;
 }
 
 class MessageHandler : public IMessageHandler
@@ -43,7 +43,7 @@ public:
     void Execute();
     void TransferData(std::unique_ptr<DaemonRequestT>& req);
 
-    void AddDaemonRequest(const std::string& sender, const std::string& module, const std::string& command, const std::string &parameter, const std::string& value);
+    void AddDaemonRequest(const std::string& sender, const std::string& module, const std::string& command, const std::string &parameter, const std::string& value1, const std::string& value2 = nullptr);
 
     void OutputReceivedData(ns::JSONSetting setting, std::string& message);
 };

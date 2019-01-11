@@ -16,13 +16,12 @@ std::string GetCurrentTimestamp()
 }
 
 Daemon::Daemon() :
+    _socketPath("/tmp/axiom_daemon.uds"),
+    _processID(std::to_string(getpid())),
     _running(true),
     _socketDesc(0)
 {
-    _socketPath = "/tmp/axiom_daemon.uds";
-    
-    _processID = std::to_string(getpid());
-    sd_journal_print(LOG_INFO, "Initialization");
+    sd_journal_print(LOG_INFO, "Daemon initialization");
 
     // TODO (BAndiT1983): Rework to map, see image_sensor example below
     _memoryAdapter = new MemoryAdapter();
@@ -157,9 +156,9 @@ void Daemon::ProcessReceivedData(uint8_t* receivedBuffer)
 
     auto module = _module_iterator->second;
 
-    std::string value = req->value;
+    std::string value = req->value1;
 
-    bool result = module->HandleParameter(req->command, req->parameter, req.get()->value, req.get()->message);
+    bool result = module->HandleParameter(req->command, req->parameter, req.get()->value1, req.get()->value2, req.get()->message);
 
     // TODO (BAndiT1983):Check if assignments are really required, or if it's suitable of just passing reference to req attirbutes
     req.get()->status = result == true ? "success" : "fail";

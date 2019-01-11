@@ -12,8 +12,8 @@ class IDaemonModule
 {
     // string& value, string& message, returns: bool - success or fail
     typedef std::function<bool(std::string&, std::string&)> GetterFunc;
-    // string value, string& message, returns: bool - success or fail
-    typedef std::function<bool(std::string, std::string&)> SetterFunc;
+    // string value1, string value2, string& message, returns: bool - success or fail
+    typedef std::function<bool(std::string, std::string, std::string&)> SetterFunc;
 
     struct ParameterHandler
     {
@@ -75,7 +75,7 @@ public:
 
     //virtual std::vector<std::string>GetAvailableMethods() = 0;
 
-    bool HandleParameter(std::string command, std::string parameterName, std::string& parameterValue, std::string& message)
+    bool HandleParameter(std::string command, std::string parameterName, std::string& parameterValue1, std::string& parameterValue2, std::string& message)
     {
         std::string originalParameterName = parameterName;
         std::unordered_map<std::string, ParameterHandler>::const_iterator got = parameterHandlers.find (parameterName);
@@ -90,9 +90,18 @@ public:
             JournalLogger::Log("Handler found");
 
             auto handler = got->second;
-            auto method = (command == "set") ? handler.Setter : handler.Getter;
+            //auto method = (command == "set") ? handler.Setter : handler.Getter;
+            bool result = false;
+            if(command == "set")
+            {
+                result = handler.Setter(parameterValue1, parameterValue2, message);
+            }
+            else if(command == "get")
+            {
+                result = handler.Getter(parameterValue1, message);
+            }
 
-            return method(parameterValue, message);
+            return result;
         }
     }
 };

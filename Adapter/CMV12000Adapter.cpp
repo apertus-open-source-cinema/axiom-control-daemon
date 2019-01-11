@@ -8,6 +8,8 @@ using MemAdapter = MemoryAdapterDummy;
 using MemAdapter = MemoryAdapter;
 #endif
 
+#define GETTER_FUNC(A) std::bind(A, this, std::placeholders::_1, std::placeholders::_2)
+#define SETTER_FUNC(A) std::bind(A, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)
 
 CMV12000Adapter::CMV12000Adapter() :
     address(0x60000000),
@@ -25,10 +27,8 @@ void CMV12000Adapter::RegisterAvailableMethods()
     //RegisterMethods("set_gain", std::bind(&CMV12000Adapter::SetGain, this, std::placeholders::_1));
 
     // TODO: Add macros to simplify registering of getter and setter, e.g. GETTER_FUNC(CMV12000Adapter, GetGain)
-    AddParameterHandler("analog_gain", std::bind(&CMV12000Adapter::GetAnalogGain, this, std::placeholders::_1, std::placeholders::_2),
-                        std::bind(&CMV12000Adapter::SetAnalogGain, this, std::placeholders::_1, std::placeholders::_2));
-    AddParameterHandler("digital_gain", std::bind(&CMV12000Adapter::GetDigitalGain, this, std::placeholders::_1, std::placeholders::_2),
-                        std::bind(&CMV12000Adapter::SetDigitalGain, this, std::placeholders::_1, std::placeholders::_2));
+    AddParameterHandler("analog_gain", GETTER_FUNC(&CMV12000Adapter::GetAnalogGain), SETTER_FUNC(&CMV12000Adapter::SetAnalogGain));
+    AddParameterHandler("digital_gain", GETTER_FUNC(&CMV12000Adapter::GetDigitalGain), SETTER_FUNC(&CMV12000Adapter::SetDigitalGain));
 }
 
 CMV12000Adapter::~CMV12000Adapter()
@@ -36,7 +36,7 @@ CMV12000Adapter::~CMV12000Adapter()
     _memoryAdapter->MemoryUnmap(address, memorySize);
 }
 
-bool CMV12000Adapter::SetAnalogGain(std::string gainValue, std::string& message)
+bool CMV12000Adapter::SetAnalogGain(std::string gainValue, std::string, std::string& message)
 {
     if(gainValue.length() > 1)
     {
@@ -70,7 +70,7 @@ bool CMV12000Adapter::GetAnalogGain(std::string& gainValue, std::string& message
     return true;
 }
 
-bool CMV12000Adapter::SetDigitalGain(std::string gainValue, std::string &message)
+bool CMV12000Adapter::SetDigitalGain(std::string gainValue, std::string, std::string &message)
 {
     _digitalGainValue = static_cast<unsigned int>(stoi(gainValue));
     // TODO: Add handling of 3/3 gain value

@@ -5,16 +5,14 @@ FILE(GLOB SOURCE_FILES "*.cpp" "*.h")
 
 # uWebSockets
 INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/../3rdParty/uWebSockets/src)
-FILE(GLOB UWEBSOCKETS_SOURCE_FILES "${PROJECT_SOURCE_DIR}/../3rdParty/uWebSockets/src/*.cpp")
+add_custom_target(uWebSockets
+                  COMMAND make Linux
+                  WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/../3rdParty/uWebSockets/)
 
 MESSAGE(STATUS "Files: ${SOURCE_FILES}")
-ADD_EXECUTABLE(${PROJECT_NAME} ${SOURCE_FILES} ${UWEBSOCKETS_SOURCE_FILES})
-
-ExternalProject_Get_Property(flatbuffers_project SOURCE_DIR)
-MESSAGE(STATUS "flatbuffers source dir: ${SOURCE_DIR}")
-TARGET_INCLUDE_DIRECTORIES(${PROJECT_NAME} PUBLIC ${SOURCE_DIR}/include)
+ADD_EXECUTABLE(${PROJECT_NAME} ${SOURCE_FILES})
 
 TARGET_INCLUDE_DIRECTORIES(${PROJECT_NAME} PUBLIC ${CMAKE_BINARY_DIR}/src/ ../3rdParty/)
 
-ADD_DEPENDENCIES(${PROJECT_NAME} flatbuffers_project flatc_cpp_gen)
-TARGET_LINK_LIBRARIES(${PROJECT_NAME} ssl z crypto)
+ADD_DEPENDENCIES(${PROJECT_NAME} axiom_daemon)
+TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${PROJECT_SOURCE_DIR}/../3rdParty/uWebSockets/libuWS.so ssl z crypto)

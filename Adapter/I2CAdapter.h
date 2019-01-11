@@ -37,7 +37,7 @@ public:
     void ReadBlock(uint8_t *data, unsigned int length) override;
     void WriteBlock(uint8_t *data, unsigned int length) override;
 
-    void Execute();
+    void Execute() override;
 
     std::vector<std::string> GetAvailableMethods()
     {

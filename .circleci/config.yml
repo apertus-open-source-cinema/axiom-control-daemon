@@ -15,7 +15,16 @@ jobs:
             git submodule update --remote
       - run:
           name: Prepare environment
-          command: pacman -Qi openssl-1.0 && mkdir build && cd build && cmake ..
+          command: |
+            mkdir build
       - run:
           name: Build
-          command: cd build && make -j4
+          command: |
+            cd build
+            cmake -DENABLE_MOCK=1 ..
+            make -j4
+      - run:
+          name: Test
+          command: |
+            cd build
+            ./DaemonTests

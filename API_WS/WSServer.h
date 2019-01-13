@@ -7,15 +7,9 @@
 #include <websocketpp/config/asio_no_tls.hpp>
 #include <websocketpp/server.hpp>
 
-//#include <App.h>
 #include "MessageHandler.h"
 
 struct JSONSetting;
-//namespace uWS
-//{
-//    struct TemplatedApp;
-//    typedef TemplatedApp App;
-//}
 
 class WSServer
 {
@@ -27,7 +21,7 @@ class WSServer
     std::shared_ptr<IMessageHandler> _messageHandler;
 
 public:
-    explicit WSServer(int port);
+    explicit WSServer(uint16_t port);
     ~WSServer();
 
     void Start();

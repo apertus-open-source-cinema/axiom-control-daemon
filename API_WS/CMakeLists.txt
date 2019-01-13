@@ -3,17 +3,6 @@ PROJECT(WSServer)
 
 FILE(GLOB SOURCE_FILES "*.cpp" "*.h")
 
-# Required by restinio
-ADD_COMPILE_OPTIONS(-std=c++14)
-
-# uWebSockets
-#INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/../3rdParty/uWebSockets/src)
-#INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/3rdParty/uWebSockets/uSockets/src)
-
-#add_custom_target(uSockets
-#                  COMMAND make
-#                  WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/../3rdParty/uWebSockets/uSockets)
-
 MESSAGE(STATUS "Files: ${SOURCE_FILES}")
 ADD_EXECUTABLE(${PROJECT_NAME} ${SOURCE_FILES})
 
@@ -22,4 +11,4 @@ INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/3rdParty/asio/asio/include/)
 TARGET_INCLUDE_DIRECTORIES(${PROJECT_NAME} PUBLIC ${CMAKE_BINARY_DIR}/src/ ../3rdParty/)
 
 ADD_DEPENDENCIES(${PROJECT_NAME} axiom_daemon)
-TARGET_LINK_LIBRARIES(${PROJECT_NAME} z ssl crypto pthread)
+TARGET_LINK_LIBRARIES(${PROJECT_NAME} pthread)

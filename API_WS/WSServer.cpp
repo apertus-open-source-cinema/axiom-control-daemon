@@ -4,7 +4,7 @@ using websocketpp::lib::placeholders::_1;
 using websocketpp::lib::placeholders::_2;
 using websocketpp::lib::bind;
 
-WSServer::WSServer(int port):
+WSServer::WSServer(uint16_t port):
     _messageHandler(std::make_shared<MessageHandler>())
 {
     _port = port;

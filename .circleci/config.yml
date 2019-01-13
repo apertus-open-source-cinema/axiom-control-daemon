@@ -21,8 +21,8 @@ jobs:
           name: Build
           command: |
             cd build
-            cmake -DENABLE_MOCK=1 ..
-            make -j4
+            cmake -DENABLE_MOCK=1 -GNinja ..
+            ninja
       - run:
           name: Test
           command: |

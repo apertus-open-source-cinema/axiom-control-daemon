@@ -7,11 +7,6 @@ SET(CMAKE_VERBOSE_MAKEFILE, ON)
 # Required by flatbuffers also
 ADD_COMPILE_OPTIONS(-std=c++11)
 
-#OPTION(ENABLE_MOCK "For development: Enable mock classes which prevent crashes on PC" OFF)
-#IF(ENABLE_MOCK)
-#    ADD_DEFINITIONS(-DENABLE_MOCK)
-#ENDIF(ENABLE_MOCK)
-
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/..)
 
 INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/../3rdParty/)
@@ -24,7 +19,6 @@ FILE(GLOB SOURCE_FILES "*.cpp" "*.h"
                        "../API_WS/MessageHandler.cpp" "../API_WS/MessageHandler.h")
 
 list(REMOVE_ITEM SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/../API_WS/Main.cpp")
-message("${SOURCE_FILES}")
 
 ADD_EXECUTABLE(${PROJECT_NAME} ${SOURCE_FILES})
 ADD_DEPENDENCIES(${PROJECT_NAME} axiom_daemon)

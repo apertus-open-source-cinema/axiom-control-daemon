@@ -42,7 +42,6 @@ INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/3rdParty/flatbuffers/include/)
 
 ExternalProject_Get_Property(flatbuffers_project BINARY_DIR)
 SET(FLATC ${BINARY_DIR}/flatc)
-MESSAGE(STATUS "flatc location: ${FLATC}")
 
 # C/C++schema
 FILE(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/src/Schema/)

@@ -2,12 +2,12 @@ version: 2
 jobs:
   build:
     docker:
-      - image: base/archlinux
+      - image: greyltc/archlinux
     steps:
+      - checkout
       - run:
           name: Install required packages
-          command: yes | pacman -Sy cmake z openssl git
-      - checkout
+          command: pacman -Sy --noconfirm clang make cmake openssl-1.0 gnutls z git systemd ninja
       - run:
           name: "Pull submodules"
           command: |
@@ -15,7 +15,7 @@ jobs:
             git submodule update --remote
       - run:
           name: Prepare environment
-          command: mkdir build && cd build && cmake ..
+          command: pacman -Qi openssl-1.0 && mkdir build && cd build && cmake ..
       - run:
           name: Build
-          command: make -j4
+          command: cd build && make -j4

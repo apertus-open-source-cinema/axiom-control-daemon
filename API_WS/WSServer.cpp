@@ -1,11 +1,11 @@
 #include "WSServer.h"
 
-#include <WebSocket.h>
-
-using namespace uWS;
+using websocketpp::lib::placeholders::_1;
+using websocketpp::lib::placeholders::_2;
+using websocketpp::lib::bind;
 
 WSServer::WSServer(int port):
-_messageHandler(std::make_shared<MessageHandler>())
+    _messageHandler(std::make_shared<MessageHandler>())
 {
     _port = port;
 
@@ -18,25 +18,31 @@ WSServer::~WSServer()
 
 void WSServer::Setup()
 {
-    hub = std::make_shared<Hub>();
+    _server = std::make_shared<wsserver>();
 
-    auto messageHandler = [&](uWS::WebSocket<uWS::SERVER> *ws, char *message, size_t length, uWS::OpCode opCode) 
+    auto messageHandler = [&](wsserver* s, websocketpp::connection_hdl hdl, wsserver::message_ptr msg)
     {
         //ws->send("ACK", 3, opCode);
-        std::string convertedMessage = std::string(message, message + length);
+        std::string convertedMessage = msg->get_payload();
         std::string responseMessage;
         bool status = _messageHandler->ProcessMessage(convertedMessage, responseMessage);
         
-        ws->send(responseMessage.c_str(), responseMessage.length(), opCode);
+        s->send(hdl, responseMessage, msg->get_opcode());
     };
 
-    hub->onMessage(messageHandler);
+    _server->set_access_channels(websocketpp::log::alevel::all);
+    _server->clear_access_channels(websocketpp::log::alevel::frame_payload);
+
+    // Initialize Asio
+    _server->init_asio();
+
+    // Register our message handler
+    _server->set_message_handler(std::bind(messageHandler, _server.get(), ::_1, ::_2));
 }
 
 void WSServer::Start()
-{
-    if (hub->listen(_port)) 
-    {
-        hub->run();
-    }
+{    
+    _server->listen(_port);
+    _server->start_accept();
+    _server->run();
 }

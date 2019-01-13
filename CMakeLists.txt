@@ -3,9 +3,9 @@ PROJECT(axiom_daemon)
 
 include(ExternalProject)
 
-SET(CMAKE_GENERATOR "Unix Makefiles" CACHE INTERNAL "" FORCE)
+#SET(CMAKE_GENERATOR "Unix Makefiles" CACHE INTERNAL "" FORCE)
 # For faster builds
-#SET(CMAKE_GENERATOR "Ninja" CACHE INTERNAL "" FORCE)
+SET(CMAKE_GENERATOR "Ninja" CACHE INTERNAL "" FORCE)
 
 # If more info about build issues is required
 #SET(CMAKE_VERBOSE_MAKEFILE ON)
@@ -19,7 +19,7 @@ ENDIF(ENABLE_MOCK)
 ADD_COMPILE_OPTIONS(-std=c++11)
 
 # Make GCC more strict
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra")
+#SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra")
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 

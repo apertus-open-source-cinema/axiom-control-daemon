@@ -1,6 +1,9 @@
-[submodule "3rdParty/uWebSockets"]
-	path = 3rdParty/uWebSockets
-	url = https://github.com/uNetworking/uWebSockets.git
 [submodule "3rdParty/flatbuffers"]
 	path = 3rdParty/flatbuffers
 	url = https://github.com/google/flatbuffers.git
+[submodule "3rdParty/websocketpp"]
+	path = 3rdParty/websocketpp
+	url = https://github.com/zaphoyd/websocketpp.git
+[submodule "3rdParty/asio"]
+	path = 3rdParty/asio
+	url = https://github.com/chriskohlhoff/asio.git

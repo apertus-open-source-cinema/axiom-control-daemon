@@ -36,12 +36,18 @@ class CMV12000Adapter : public IDaemonModule
     bool SetDigitalGain(std::string gainValue, std::string, std::string& message);
     bool GetDigitalGain(std::string& gainValue, std::string& message);
 
+    // Configuration register
+    bool SetConfigRegister(const std::string registerIndex, std::string value, std::string &message);
+    // NOTE: On request value contains register index, on reply current value is returned
+    bool GetConfigRegister(std::string& value, std::string& message);
+
+
+    virtual void SetCMVConfigRegister(u_int8_t registerIndex, unsigned int value);
+
 public:
     CMV12000Adapter();
 
     ~CMV12000Adapter();
-
-    virtual void SetConfigRegister(u_int8_t registerIndex, unsigned int value);
 
     void Execute();
 

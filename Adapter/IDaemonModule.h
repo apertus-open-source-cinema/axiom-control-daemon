@@ -11,9 +11,9 @@
 class IDaemonModule
 {
     // string& value, string& message, returns: bool - success or fail
-    typedef std::function<bool(std::string&, std::string&)> GetterFunc;
+    using GetterFunc = std::function<bool(std::string&, std::string&)>;
     // string value1, string value2, string& message, returns: bool - success or fail
-    typedef std::function<bool(std::string, std::string, std::string&)> SetterFunc;
+    using SetterFunc = std::function<bool(std::string, std::string, std::string&)>;
 
     struct ParameterHandler
     {

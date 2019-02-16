@@ -41,7 +41,8 @@ public:
     virtual void WriteWord(unsigned reg, uint16_t val)
     {
         volatile uint32_t* ptr = reinterpret_cast<uint32_t*>(baseAddress);
-        ptr[reg] = val;
+        ptr[reg] &= ~val;
+        ptr[reg] |= val;
     }
 
     virtual uint16_t ReadWord(unsigned reg)

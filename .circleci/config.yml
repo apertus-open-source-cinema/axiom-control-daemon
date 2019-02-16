@@ -7,7 +7,7 @@ jobs:
       - checkout
       - run:
           name: Install required packages
-          command: pacman -Sy --noconfirm clang make cmake openssl-1.0 gnutls z git systemd ninja
+          command: pacman -Sy --noconfirm clang make cmake openssl-1.0 gnutls z git ninja
       - run:
           name: "Pull submodules"
           command: |

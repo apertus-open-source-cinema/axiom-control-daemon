@@ -186,23 +186,7 @@ bool Daemon::ProcessGeneralRequest(std::unique_ptr<DaemonRequestT> &req)
     }
     else if(req.get()->command == "reset")
     {
-        if(req.get()->parameter != "")
-        {
-            _module_iterator = _modules.find(it.value()["module"]);
-            if (_module_iterator == _modules.end())
-            {
-                std::cout << "Unknown module: " << it.value()["moduleName"];
-                continue;
-            }
-
-            auto module = _module_iterator->second;
-
-            processingFunc(module.get(), it.value());
-        }
-        else
-        {
-            ProcessAvailableParameters(std::bind(&Daemon::ResetParameterValues, this, std::placeholders::_1, std::placeholders::_2));
-        }
+        ProcessAvailableParameters(std::bind(&Daemon::ResetParameterValues, this, std::placeholders::_1, std::placeholders::_2));
 
         req.get()->value1 = availableParameters.dump();
         req.get()->message = "";

@@ -5,7 +5,7 @@ include(ExternalProject)
 
 #SET(CMAKE_GENERATOR "Unix Makefiles" CACHE INTERNAL "" FORCE)
 # For faster builds
-SET(CMAKE_GENERATOR "Ninja" CACHE INTERNAL "" FORCE)
+#SET(CMAKE_GENERATOR "Ninja" CACHE INTERNAL "" FORCE)
 
 # If more info about build issues is required
 #SET(CMAKE_VERBOSE_MAKEFILE ON)
@@ -63,6 +63,7 @@ FILE(GLOB SOURCE_FILES "Adapter/*.cpp" "Adapter/*.h"
 
 # Copy systemd description files
 FILE(COPY "${CMAKE_SOURCE_DIR}/systemd/" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
+FILE(COPY "${CMAKE_SOURCE_DIR}/Daemon/description.json" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
 
 # Client example should be build separately for now
 ADD_SUBDIRECTORY(API_WS)
@@ -70,7 +71,7 @@ ADD_SUBDIRECTORY(CLI)
 #ADD_SUBDIRECTORY(${PROJECT_SOURCE_DIR}/GoAPI/)
 
 # Catch2 (unit test framework)
-INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/../3rdParty/)
+INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/3rdParty/)
 
 # Unit tests
 ADD_SUBDIRECTORY(${PROJECT_SOURCE_DIR}/UnitTests/)

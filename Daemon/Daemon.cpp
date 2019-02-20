@@ -24,8 +24,8 @@ Daemon::Daemon() :
     sd_journal_print(LOG_INFO, "Daemon initialization");
 
     // TODO (BAndiT1983): Rework to map, see image_sensor example below
-    _memoryAdapter = new MemoryAdapter();
-    _i2cAdapter = new I2CAdapter();
+    //_memoryAdapter = new MemoryAdapter();
+    //_i2cAdapter = new I2CAdapter();
 
     _modules["image_sensor"] = std::make_shared<CMV12000Adapter>();
 
@@ -37,12 +37,15 @@ Daemon::Daemon() :
     // TODO (BAndiT1983): Add fallback to older revision version if for current one no file is available
     //_memoryAdapter->ReadDescriptions("../Descriptions/Memory_rev" + revision + ".json");
     //_i2cAdapter->ReadDescriptions("../Descriptions/I2C_rev" + revision + ".json");
+
+    std::ifstream ifs("description.json");
+    availableParameters = json::parse(ifs);
 }
 
 Daemon::~Daemon()
 {
-    delete _memoryAdapter;
-    delete _i2cAdapter;
+    //delete _memoryAdapter;
+    //delete _i2cAdapter;
 }
 
 void Daemon::Setup()
@@ -97,35 +100,35 @@ void Daemon::Process()
 
 void Daemon::ProcessClient(int socket)
 {
-        uint8_t* receivedBuffer = new uint8_t[1024];
-        std::cout << "NEW CLIENT" << std::endl;
-        std::cout << "Socket: " << socket << std::endl;
+    uint8_t* receivedBuffer = new uint8_t[1024];
+    std::cout << "NEW CLIENT" << std::endl;
+    std::cout << "Socket: " << socket << std::endl;
 
-        while(1)
+    while(1)
+    {
+        if(socket < 0)
         {
-            if(socket < 0)
-            {
-                printf("ACCEPT ERROR = %s\n", strerror(errno));
-                return;
-            }
+            printf("ACCEPT ERROR = %s\n", strerror(errno));
+            return;
+        }
 
-            // Wait for packets to arrive
-            ssize_t size = RetrieveIncomingData(socket, receivedBuffer, 1024);
-            if(size <= 0)
-            {
-                return;
-            }
+        // Wait for packets to arrive
+        ssize_t size = RetrieveIncomingData(socket, receivedBuffer, 1024);
+        if(size <= 0)
+        {
+            return;
+        }
 
-            std::cout << "Received buffer size: " << receivedBuffer << std::endl;
-            ProcessReceivedData(receivedBuffer);
+        std::cout << "Received buffer size: " << receivedBuffer << std::endl;
+        ProcessReceivedData(receivedBuffer);
 
-            ssize_t error = send(socket, _builder.GetBufferPointer(), _builder.GetSize(), 0);
-            if(error < 0)
-            {
-                std::cout << "Error while sending response." << std::endl;
-                printf("SEND ERROR = %s\n", strerror(errno));
-            }
-        }    
+        ssize_t error = send(socket, _builder.GetBufferPointer(), _builder.GetSize(), 0);
+        if(error < 0)
+        {
+            std::cout << "Error while sending response." << std::endl;
+            printf("SEND ERROR = %s\n", strerror(errno));
+        }
+    }
 }
 
 void Daemon::ProcessReceivedData(uint8_t* receivedBuffer)
@@ -144,9 +147,9 @@ void Daemon::ProcessReceivedData(uint8_t* receivedBuffer)
     }
 
     _module_iterator = _modules.find(moduleName);
-     std::string message = "";
+    std::string message = "";
     if (_module_iterator == _modules.end())
-    {        
+    {
         message = "Received: Unknown module";
         sd_journal_print(LOG_INFO, "Received: Unknown module");
         req.get()->message = message;
@@ -161,7 +164,7 @@ void Daemon::ProcessReceivedData(uint8_t* receivedBuffer)
     bool result = module->HandleParameter(req->command, req->parameter, req.get()->value1, req.get()->value2, req.get()->message);
 
     // TODO (BAndiT1983):Check if assignments are really required, or if it's suitable of just passing reference to req attirbutes
-    req.get()->status = result == true ? "success" : "fail";
+    req.get()->status = (result == true) ? "STATUS_SUCCESS" : "STATUS_FAIL";
     req.get()->timestamp = GetCurrentTimestamp();
 
     _builder.Finish(CreateDaemonRequest(_builder, req.get()));
@@ -172,13 +175,39 @@ bool Daemon::ProcessGeneralRequest(std::unique_ptr<DaemonRequestT> &req)
     bool result = false;
     req.get()->status = "fail";
 
-    if(req.get()->command == "get_available_methods")
+    if(req.get()->command == "get" && req.get()->parameter == "available_parameters")
     {
-        req.get()->message = "Available Methods: NONE";
+        ProcessAvailableParameters(std::bind(&Daemon::RetrieveCurrentParameterValues, this, std::placeholders::_1, std::placeholders::_2));
+
+        req.get()->value1 = availableParameters.dump();
+        req.get()->message = "";
         req.get()->status = "success";
         req.get()->timestamp = GetCurrentTimestamp();
+    }
+    else if(req.get()->command == "reset")
+    {
+        if(req.get()->parameter != "")
+        {
+            _module_iterator = _modules.find(it.value()["module"]);
+            if (_module_iterator == _modules.end())
+            {
+                std::cout << "Unknown module: " << it.value()["moduleName"];
+                continue;
+            }
 
-        result = true;
+            auto module = _module_iterator->second;
+
+            processingFunc(module.get(), it.value());
+        }
+        else
+        {
+            ProcessAvailableParameters(std::bind(&Daemon::ResetParameterValues, this, std::placeholders::_1, std::placeholders::_2));
+        }
+
+        req.get()->value1 = availableParameters.dump();
+        req.get()->message = "";
+        req.get()->status = "success";
+        req.get()->timestamp = GetCurrentTimestamp();
     }
 
     return result;
@@ -218,6 +247,44 @@ ssize_t Daemon::RetrieveIncomingData(int socket, uint8_t* receivedBuffer, unsign
         printf("Received data size: %ld\n", size);
         printf("RECV ERROR = %s\n", strerror(errno));
     }
-            
+
     return size;
+}
+
+void Daemon::ProcessAvailableParameters(std::function<void (IDaemonModule*, json&)> processingFunc)
+{
+    for(json::iterator it = availableParameters.begin(); it != availableParameters.end(); ++it)
+    {
+        _module_iterator = _modules.find(it.value()["module"]);
+        if (_module_iterator == _modules.end())
+        {
+            std::cout << "Unknown module: " << it.value()["moduleName"];
+            continue;
+        }
+
+        auto module = _module_iterator->second;
+
+        processingFunc(module.get(), it.value());
+    }
+}
+
+void Daemon::RetrieveCurrentParameterValues(IDaemonModule* module, json& description)
+{
+    std::string currentValue;
+    std::string temp1;
+    std::string temp2;
+    bool result = module->HandleParameter("get", description["parameter"], currentValue, temp1, temp2);
+
+    if(result)
+    {
+        description["currentValue"] = currentValue;
+    }
+}
+
+void Daemon::ResetParameterValues(IDaemonModule *module, json& description)
+{
+    std::string currentValue = description["defaultValue"];
+    std::string temp1;
+    std::string temp2;
+    module->HandleParameter("set", description["parameter"], currentValue, temp1, temp2);
 }

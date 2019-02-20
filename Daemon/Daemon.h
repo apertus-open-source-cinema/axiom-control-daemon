@@ -10,6 +10,9 @@
 #include <systemd/sd-daemon.h>
 #include <systemd/sd-journal.h>
 
+#include "json/json.hpp"
+using json = nlohmann::json;
+
 #include "../Adapter/I2CAdapter.h"
 #include "../Adapter/MemoryAdapter.h"
 #include "../Adapter/CMV12000Adapter.h"
@@ -34,6 +37,8 @@ class Daemon
     IAdapter* _memoryAdapter = nullptr;
     IAdapter* _i2cAdapter = nullptr;
 
+    json availableParameters;
+
     flatbuffers::FlatBufferBuilder _builder;
 
     std::unordered_map<std::string, std::shared_ptr<IDaemonModule>> _modules;
@@ -51,13 +56,18 @@ class Daemon
     bool ProcessGeneralRequest(std::unique_ptr<DaemonRequestT> &req);
 
     void ProcessClient(int socket);
+
+    void ProcessAvailableParameters(std::function<void(IDaemonModule*, json&)>);
+    void RetrieveCurrentParameterValues(IDaemonModule *module, json& description);
+    void ResetParameterValues(IDaemonModule *module, json& description);
+
 public:
     Daemon();
 
     ~Daemon();
 
     void Setup();
-    void Start();    
+    void Start();
 };
 
 #endif //DAEMON_H

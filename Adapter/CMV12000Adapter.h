@@ -21,8 +21,9 @@ class CMV12000Adapter : public IDaemonModule
 
     // Analog gain
     unsigned int _analogGainValue;
-    unsigned int _gainPGA[8] = {0, 1, 0, 3, 7, 1, 3, 7};
-    unsigned int _divPGA[8] = {8, 8, 0, 8, 8, 0, 0, 0};
+    //unsigned int _gainPGA[8] = {0, 1, 0, 3, 7, 1, 3, 7};
+    //unsigned int _divPGA[8] = {8, 8, 0, 8, 8, 0, 0, 0};
+    unsigned int _gainPGA[8] = {8, 9, 0, 11, 15, 1, 3, 7};
     std::string _analogGainTextValues[8] = {"1/3", "2/3", "1", "3/3", "4/3", "2", "3", "4"};
 
     bool SetAnalogGain(std::string gainValue, std::string, std::string& message);

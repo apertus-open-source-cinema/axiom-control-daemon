@@ -51,11 +51,7 @@ bool CMV12000Adapter::SetAnalogGain(std::string gainValue, std::string, std::str
     }
 
     // Set division first, to prevent overwriting gain values
-    SetCMVConfigRegister(115, _divPGA[_analogGainValue]);
     SetCMVConfigRegister(115, _gainPGA[_analogGainValue]);
-    //    SetConfigRegister(100, 1);
-    //    SetConfigRegister(87, 2000);
-    //    SetConfigRegister(88, 2000);
 
     return true;
 }
@@ -120,20 +116,3 @@ void CMV12000Adapter::Execute()
 {
     // TODO: Iterate through all added settings and apply them to SPI registers
 }
-
-//std::string CMV12000Adapter::GetParameter(std::string parameterName)
-//{
-//    std::unordered_map<std::string, ParameterHandler>::const_iterator got = parameterHandlers.find (parameterName);
-//    if ( got == parameterHandlers.end() )
-//    {
-//        JournalLogger::Log("ImageSensor: Handler not found");
-//        return false;
-//    }
-//    else
-//    {
-//        JournalLogger::Log("ImageSensor: Handler found");
-
-//        auto handler = got->second;
-//        return handler.Getter(*this);
-//    }
-//}

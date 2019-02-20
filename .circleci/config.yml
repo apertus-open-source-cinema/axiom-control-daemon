@@ -7,7 +7,7 @@ jobs:
       - checkout
       - run:
           name: Install required packages
-          command: pacman -Sy --noconfirm clang make cmake git systemd ninja
+          command: pacman -Syyu --noconfirm clang make cmake git systemd ninja
       - run:
           name: "Pull submodules"
           command: |

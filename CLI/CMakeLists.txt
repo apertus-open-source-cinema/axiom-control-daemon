@@ -1,8 +1,7 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 3.10)
 PROJECT(DaemonCLI)
 
-FILE(GLOB SOURCE_FILES "*.cpp" "*.h"
-                       "${CMAKE_SOURCE_DIR}/API_WS/MessageHandler.cpp" "${CMAKE_SOURCE_DIR}/API_WS/MessageHandler.h")
+FILE(GLOB SOURCE_FILES "*.cpp" "*.h" "${CMAKE_SOURCE_DIR}/API_WS/MessageHandler.cpp" "${CMAKE_SOURCE_DIR}/API_WS/MessageHandler.h")
 
 ADD_EXECUTABLE(${PROJECT_NAME} ${SOURCE_FILES})
 ADD_DEPENDENCIES(${PROJECT_NAME} axiom_daemon)

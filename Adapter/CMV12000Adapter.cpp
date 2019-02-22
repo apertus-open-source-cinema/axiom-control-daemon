@@ -24,11 +24,9 @@ CMV12000Adapter::CMV12000Adapter() :
 
 void CMV12000Adapter::RegisterAvailableMethods()
 {
-    //RegisterMethods("set_gain", std::bind(&CMV12000Adapter::SetGain, this, std::placeholders::_1));
-
-    // TODO: Add macros to simplify registering of getter and setter, e.g. GETTER_FUNC(CMV12000Adapter, GetGain)
     AddParameterHandler("analog_gain", GETTER_FUNC(&CMV12000Adapter::GetAnalogGain), SETTER_FUNC(&CMV12000Adapter::SetAnalogGain));
     AddParameterHandler("digital_gain", GETTER_FUNC(&CMV12000Adapter::GetDigitalGain), SETTER_FUNC(&CMV12000Adapter::SetDigitalGain));
+    AddParameterHandler("config_register", GETTER_FUNC(&CMV12000Adapter::GetConfigRegister), SETTER_FUNC(&CMV12000Adapter::SetConfigRegister));
 }
 
 CMV12000Adapter::~CMV12000Adapter()
@@ -53,11 +51,7 @@ bool CMV12000Adapter::SetAnalogGain(std::string gainValue, std::string, std::str
     }
 
     // Set division first, to prevent overwriting gain values
-    SetConfigRegister(115, _divPGA[_analogGainValue]);
-    SetConfigRegister(115, _gainPGA[_analogGainValue]);
-    //    SetConfigRegister(100, 1);
-    //    SetConfigRegister(87, 2000);
-    //    SetConfigRegister(88, 2000);
+    SetCMVConfigRegister(115, _gainPGA[_analogGainValue]);
 
     return true;
 }
@@ -81,7 +75,7 @@ bool CMV12000Adapter::SetDigitalGain(std::string gainValue, std::string, std::st
         return false;
     }
 
-    SetConfigRegister(117, _digitalGainValues[_digitalGainValue]);
+    SetCMVConfigRegister(117, _digitalGainValues[_digitalGainValue]);
 
     return true;
 }
@@ -94,7 +88,23 @@ bool CMV12000Adapter::GetDigitalGain(std::string &gainValue, std::string &messag
     return true;
 }
 
-void CMV12000Adapter::SetConfigRegister(u_int8_t registerIndex, unsigned int value)
+bool CMV12000Adapter::SetConfigRegister(const std::string registerIndex, std::string value, std::string &message)
+{
+    SetCMVConfigRegister(std::stoi(registerIndex), std::stoi(value));
+
+    return true;
+}
+
+bool CMV12000Adapter::GetConfigRegister(std::string &value, std::string &message)
+{
+    // on request: value = register index
+    uint16_t val = _memoryAdapter->ReadWord(std::stoi(value));
+    value = std::to_string(val);
+
+    return true;
+}
+
+void CMV12000Adapter::SetCMVConfigRegister(u_int8_t registerIndex, unsigned int value)
 {
     std::string message = "SetConfigRegister() - Register: " + std::to_string(registerIndex) + " | Value: " + std::to_string(value);
     JournalLogger::Log(message);
@@ -106,20 +116,3 @@ void CMV12000Adapter::Execute()
 {
     // TODO: Iterate through all added settings and apply them to SPI registers
 }
-
-//std::string CMV12000Adapter::GetParameter(std::string parameterName)
-//{
-//    std::unordered_map<std::string, ParameterHandler>::const_iterator got = parameterHandlers.find (parameterName);
-//    if ( got == parameterHandlers.end() )
-//    {
-//        JournalLogger::Log("ImageSensor: Handler not found");
-//        return false;
-//    }
-//    else
-//    {
-//        JournalLogger::Log("ImageSensor: Handler found");
-
-//        auto handler = got->second;
-//        return handler.Getter(*this);
-//    }
-//}

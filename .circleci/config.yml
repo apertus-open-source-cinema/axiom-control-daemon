@@ -11,9 +11,11 @@ jobs:
       - run:
           name: "Pull submodules"
           command: |
-            git fetch --recurse-submodules
-            #git submodule init
-            #git submodule update --remote
+            git submodule init
+            git submodule update --remote
+            # workaround for build problems after asio updates
+            cd 3rdParty/asio
+            git checkout 22afb86087a77037cd296d27134756c9b0d2cb75
       - run:
           name: Prepare environment
           command: |

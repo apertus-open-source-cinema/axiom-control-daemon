@@ -5,6 +5,7 @@ Requires=axiom.socket
 
 [Service]
 Type=simple
+WorkingDirectory=/opt/axiom_daemon
 ExecStart=/opt/axiom_daemon/axiom_daemon
 StandardInput=socket
 StandardError=journal

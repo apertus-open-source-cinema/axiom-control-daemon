@@ -19,6 +19,7 @@ echo "--- Copy daemon and systemd description files to /opt";
 cp -f axiom.service /opt/axiom_daemon/
 cp -f axiom.socket /opt/axiom_daemon/
 cp -f axiom_daemon /opt/axiom_daemon/
+cp -f description.json /opt/axiom_daemon/
 
 echo "--- Make new links for systemd description files";
 ln -s /opt/axiom_daemon/axiom.service /etc/systemd/system

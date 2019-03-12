@@ -14,7 +14,7 @@
 
 #include "../Helpers/Helpers.h"
 
-#include "../Log/JournalLogger.h"
+//#include "../Log/DefaultLogger.h"
 
 class MemoryAdapter : public IAdapter
 {
@@ -75,7 +75,8 @@ public:
         if (fd == -1)
         {
             message = "Error (open /dev/mem): " + std::string(strerror(errno));
-            JournalLogger::Log(message);
+            // TODO: Rework logging
+            //DefaultLogger::Log(message);
             return reinterpret_cast<void*>(-1);
         }
 
@@ -86,7 +87,8 @@ public:
         {
             // TODO: Add error log
             message = "Cannot map memory to address: " + std::to_string(address);
-            JournalLogger::Log(message);
+            // TODO: Rework logging
+            //DefaultLogger::Log(message);
         }
 
         baseAddress = reinterpret_cast<uintptr_t>(result);

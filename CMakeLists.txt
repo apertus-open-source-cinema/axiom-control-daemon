@@ -12,14 +12,14 @@ include(ExternalProject)
 
 OPTION(ENABLE_MOCK "Enable mock (e.g. memory-related code) implementation for developemnt" OFF) # Disabled by default
 IF(ENABLE_MOCK)
-ADD_DEFINITIONS(-DENABLE_MOCK=ON)
+    ADD_DEFINITIONS(-DENABLE_MOCK=ON)
 ENDIF(ENABLE_MOCK)
 
 # Required by flatbuffers also
 ADD_COMPILE_OPTIONS(-std=c++11)
 
 # Make GCC more strict
-#SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra")
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra")
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 
@@ -80,7 +80,7 @@ ADD_SUBDIRECTORY(${PROJECT_SOURCE_DIR}/UnitTests/)
 INCLUDE_DIRECTORIES(${CMAKE_BINARY_DIR}/src/)
 
 ADD_EXECUTABLE(${PROJECT_NAME} ${SOURCE_FILES})
-TARGET_LINK_LIBRARIES(${PROJECT_NAME} systemd pthread)
+TARGET_LINK_LIBRARIES(${PROJECT_NAME} pthread)
 
 ADD_DEPENDENCIES(${PROJECT_NAME} run_schema_generator)
 

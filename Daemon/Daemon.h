@@ -6,10 +6,6 @@
 #include <string>
 #include <unordered_map>
 
-// For systemd
-#include <systemd/sd-daemon.h>
-#include <systemd/sd-journal.h>
-
 #include "json/json.hpp"
 using json = nlohmann::json;
 
@@ -19,8 +15,12 @@ using json = nlohmann::json;
 
 #include <Schema/axiom_daemon_generated.h>
 
+class ILogger;
+
 class Daemon
-{
+{    
+    std::shared_ptr<ILogger> _logger;
+
     std::string _socketPath;
 
     // Used for logging
@@ -34,8 +34,8 @@ class Daemon
 
     std::string _statusMessage;
 
-    IAdapter* _memoryAdapter = nullptr;
-    IAdapter* _i2cAdapter = nullptr;
+    //IAdapter* _memoryAdapter = nullptr;
+    //IAdapter* _i2cAdapter = nullptr;
 
     json availableParameters;
 

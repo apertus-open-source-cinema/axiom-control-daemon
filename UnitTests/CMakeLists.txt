@@ -15,11 +15,10 @@ INCLUDE_DIRECTORIES(${CMAKE_BINARY_DIR}/src/)
 
 FILE(GLOB SOURCE_FILES "*.cpp" "*.h"
                        "../Adapter/*.cpp" "../Adapter/*.h"
+                       "../Log/*.cpp" "../Log/*.h"
                        "../API_WS/MessageHandler.cpp" "../API_WS/MessageHandler.h")
 
 list(REMOVE_ITEM SOURCE_FILES "${CMAKE_CURRENT_SOURCE_DIR}/../API_WS/Main.cpp")
 
 ADD_EXECUTABLE(${PROJECT_NAME} ${SOURCE_FILES})
 ADD_DEPENDENCIES(${PROJECT_NAME} axiom_daemon)
-
-TARGET_LINK_LIBRARIES(${PROJECT_NAME} systemd)

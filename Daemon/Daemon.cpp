@@ -5,6 +5,8 @@
 #include <sstream>
 #include <thread>
 
+#include "../Log/DefaultLogger.h"
+
 std::string GetCurrentTimestamp()
 {
     auto now = std::chrono::system_clock::now();
@@ -21,7 +23,7 @@ Daemon::Daemon() :
     _running(true),
     _socketDesc(0)
 {
-    sd_journal_print(LOG_INFO, "Daemon initialization");
+    DAEMON_LOG_INFO("Daemon initialization");
 
     // TODO (BAndiT1983): Rework to map, see image_sensor example below
     //_memoryAdapter = new MemoryAdapter();
@@ -50,24 +52,8 @@ Daemon::~Daemon()
 
 void Daemon::Setup()
 {
-    int fdCount = sd_listen_fds(0);
-    if (fdCount == 1)
-    {
-        sd_journal_print(LOG_INFO, "systemd socket activation");
-        _socketDesc = SD_LISTEN_FDS_START;
-    }
-    else if(fdCount > 1)
-    {
-        sd_journal_print(LOG_INFO, "Too many file descriptors");
-        exit(1);
-    }
-    else
-    {
-        sd_journal_print(LOG_INFO, "Number of file descriptors: %d", fdCount);
-        sd_journal_print(LOG_INFO, "Legacy socket initialization");
-        
-        SetupSocket();
-    }
+    DAEMON_LOG_INFO("Socket initialization");
+    SetupSocket();
 }
 
 void Daemon::Start()
@@ -151,7 +137,7 @@ void Daemon::ProcessReceivedData(uint8_t* receivedBuffer)
     if (_module_iterator == _modules.end())
     {
         message = "Received: Unknown module";
-        sd_journal_print(LOG_INFO, "Received: Unknown module");
+        DAEMON_LOG_INFO("Received: Unknown module");
         req.get()->message = message;
         _builder.Finish(CreateDaemonRequest(_builder, req.get()));
         return;
@@ -216,7 +202,7 @@ void Daemon::SetupSocket()
     if (result < 0)
     {
         _statusMessage = "Bind failed: " + std::string(strerror(errno));
-        sd_journal_print(LOG_ERR, "%s", _statusMessage.c_str());
+        DAEMON_LOG_ERROR(_statusMessage);
         exit(1);
     }
 

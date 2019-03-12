@@ -11,10 +11,10 @@ int HandleCommandLine(const int& argc, char* argv[], std::string& secondValue)
     switch(argc)
     {
     case 3:
-        argv[3] = "";
+        argv[3] =  const_cast<char*>("");
         break;
     case 4:
-        argv[4] = "";
+        argv[4] = const_cast<char*>("");
         break;
     case 5:
         break;

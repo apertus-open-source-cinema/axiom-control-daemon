@@ -14,8 +14,6 @@
 
 #include "../Helpers/Helpers.h"
 
-#include "../Log/JournalLogger.h"
-
 // For development on PC, which prevents crashes when trying to set values in RAM directly
 class MemoryAdapterDummy : public MemoryAdapter
 {
@@ -64,6 +62,9 @@ public:
 
     int MemoryUnmap(uint32_t address, uint32_t size) override
     {
+        UNUSED(address);
+        UNUSED(size);
+
         return 0;
     }
 

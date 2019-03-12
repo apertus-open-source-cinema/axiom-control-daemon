@@ -6,7 +6,7 @@
 #include <string>
 #include <unordered_map>
 
-#include "../Log/JournalLogger.h"
+#include "../Log/Logger.h"
 
 class IDaemonModule
 {
@@ -81,13 +81,13 @@ public:
         std::unordered_map<std::string, ParameterHandler>::const_iterator got = parameterHandlers.find (parameterName);
         if ( got == parameterHandlers.end() )
         {
-            JournalLogger::Log("Handler not found");
+            DAEMON_LOG_ERROR("Handler not found");
             message = "Handler not found: " + parameterName;
             return false;
         }
         else
         {
-            JournalLogger::Log("Handler found");
+            DAEMON_LOG_INFO("Handler found");
 
             auto handler = got->second;
             //auto method = (command == "set") ? handler.Setter : handler.Getter;

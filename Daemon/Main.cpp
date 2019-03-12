@@ -2,8 +2,11 @@
 
 #include "Daemon.h"
 
-int main(__attribute__((unused)) int argc, __attribute__((unused)) char *argv[])
+int main(int argc, char *argv[])
 {    
+    UNUSED(argc);
+    UNUSED(argv);
+
     const std::unique_ptr<Daemon> daemon(new Daemon());
     daemon->Setup();
     daemon->Start();

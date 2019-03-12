@@ -1,16 +1,12 @@
 [Unit]
 Description=Axiom Service
-After=network.target axiom.socket
-Requires=axiom.socket
 
 [Service]
 Type=simple
-WorkingDirectory=/opt/axiom_daemon
+WorkingDirectory=/opt/axiom_daemon/
 ExecStart=/opt/axiom_daemon/axiom_daemon
-StandardInput=socket
-StandardError=journal
-TimeoutStopSec=5
-Restart=on-failure
+RestartSec=1
+Restart=always
 
 [Install]
 WantedBy=multi-user.target

@@ -90,6 +90,8 @@ bool CMV12000Adapter::GetDigitalGain(std::string &gainValue, std::string &messag
 
 bool CMV12000Adapter::SetConfigRegister(const std::string registerIndex, std::string value, std::string &message)
 {
+    UNUSED(message);
+
     SetCMVConfigRegister(std::stoi(registerIndex), std::stoi(value));
 
     return true;
@@ -97,6 +99,8 @@ bool CMV12000Adapter::SetConfigRegister(const std::string registerIndex, std::st
 
 bool CMV12000Adapter::GetConfigRegister(std::string &value, std::string &message)
 {
+    UNUSED(message);
+
     // on request: value = register index
     uint16_t val = _memoryAdapter->ReadWord(std::stoi(value));
     value = std::to_string(val);
@@ -107,7 +111,7 @@ bool CMV12000Adapter::GetConfigRegister(std::string &value, std::string &message
 void CMV12000Adapter::SetCMVConfigRegister(u_int8_t registerIndex, unsigned int value)
 {
     std::string message = "SetConfigRegister() - Register: " + std::to_string(registerIndex) + " | Value: " + std::to_string(value);
-    JournalLogger::Log(message);
+    DAEMON_LOG_INFO(message);
 
     _memoryAdapter->WriteWord(registerIndex, value);
 }

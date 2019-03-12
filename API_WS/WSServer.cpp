@@ -25,8 +25,8 @@ void WSServer::Setup()
         //ws->send("ACK", 3, opCode);
         std::string convertedMessage = msg->get_payload();
         std::string responseMessage;
-        bool status = _messageHandler->ProcessMessage(convertedMessage, responseMessage);
-        
+        _messageHandler->ProcessMessage(convertedMessage, responseMessage);
+
         s->send(hdl, responseMessage, msg->get_opcode());
     };
 

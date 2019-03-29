@@ -1,13 +1,13 @@
 #ifndef MEMORYADAPTER_H
 #define MEMORYADAPTER_H
 
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <sys/mman.h>
 #include <errno.h>
+#include <fcntl.h>
 #include <string.h>
+#include <sys/mman.h>
+#include <sys/stat.h>
 #include <sys/syslog.h>
+#include <sys/types.h>
 #include <unistd.h>
 
 #include "IAdapter.h"
@@ -27,13 +27,15 @@ public:
         UNUSED(descriptionFile);
     }
 
-    void CheckDevices()  override {}
+    void CheckDevices() override
+    {
+    }
 
-    void ReadByte(uint8_t data)  override
+    void ReadByte(uint8_t data) override
     {
         UNUSED(data);
     }
-    void WriteByte(uint8_t data)  override
+    void WriteByte(uint8_t data) override
     {
         UNUSED(data);
     }
@@ -51,14 +53,14 @@ public:
         return ptr[reg];
     }
 
-    
-    void ReadBlock(uint8_t *data, unsigned int length) override
+
+    void ReadBlock(uint8_t* data, unsigned int length) override
     {
         UNUSED(data);
         UNUSED(length);
     }
 
-    void WriteBlock(uint8_t *data, unsigned int length) override
+    void WriteBlock(uint8_t* data, unsigned int length) override
     {
         UNUSED(data);
         UNUSED(length);
@@ -72,23 +74,24 @@ public:
 
         // TODO: Check if alignment is required
         int fd = open("/dev/mem", O_RDWR | O_SYNC);
-        if (fd == -1)
+        if(fd == -1)
         {
             message = "Error (open /dev/mem): " + std::string(strerror(errno));
             // TODO: Rework logging
-            //DefaultLogger::Log(message);
+            // DefaultLogger::Log(message);
             return reinterpret_cast<void*>(-1);
         }
 
         void* result = nullptr;
-        
-        result = mmap(reinterpret_cast<void*>(address), size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, address);
+
+        result = mmap(reinterpret_cast<void*>(address), size, PROT_READ | PROT_WRITE, MAP_SHARED,
+                      fd, address);
         if(result == reinterpret_cast<void*>(-1))
         {
             // TODO: Add error log
             message = "Cannot map memory to address: " + std::to_string(address);
             // TODO: Rework logging
-            //DefaultLogger::Log(message);
+            // DefaultLogger::Log(message);
         }
 
         baseAddress = reinterpret_cast<uintptr_t>(result);
@@ -103,7 +106,6 @@ public:
 
     virtual void Execute() override
     {
-
     }
 
     std::vector<std::string> GetAvailableMethods()

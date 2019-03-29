@@ -19,10 +19,10 @@ public:
     virtual void Execute() = 0;
 
     // General read/write methods
-    virtual void ReadByte(uint8_t data) = 0;
+    virtual void ReadByte(uint8_t data)  = 0;
     virtual void WriteByte(uint8_t data) = 0;
 
-    virtual void ReadBlock(uint8_t* data, unsigned int length) = 0;
+    virtual void ReadBlock(uint8_t* data, unsigned int length)  = 0;
     virtual void WriteBlock(uint8_t* data, unsigned int length) = 0;
 };
 

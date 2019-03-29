@@ -26,4 +26,6 @@ void I2CAdapter::WriteBlock(uint8_t *data, unsigned int length)
     UNUSED(length);
 }
 
-void I2CAdapter::Execute() {}
+void I2CAdapter::Execute()
+{
+}

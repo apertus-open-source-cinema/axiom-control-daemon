@@ -13,4 +13,4 @@ public:
     virtual bool ProcessMessage(std::string message, std::string& response) = 0;
 };
 
-#endif //IMESSAGEHANDLER_H
+#endif // IMESSAGEHANDLER_H

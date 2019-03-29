@@ -1,13 +1,13 @@
 #ifndef MEMORYADAPTERDUMMY_H
 #define MEMORYADAPTERDUMMY_H
 
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <sys/mman.h>
 #include <errno.h>
+#include <fcntl.h>
 #include <string.h>
+#include <sys/mman.h>
+#include <sys/stat.h>
 #include <sys/syslog.h>
+#include <sys/types.h>
 #include <unistd.h>
 
 #include "MemoryAdapter.h"
@@ -23,7 +23,9 @@ public:
         UNUSED(descriptionFile);
     }
 
-    void CheckDevices() override {}
+    void CheckDevices() override
+    {
+    }
 
     void ReadByte(uint8_t data) override
     {
@@ -39,7 +41,7 @@ public:
         UNUSED(reg);
         UNUSED(val);
     }
-    
+
     void ReadBlock(uint8_t *data, unsigned int length) override
     {
         UNUSED(data);
@@ -52,7 +54,7 @@ public:
         UNUSED(length);
     }
 
-    void* MemoryMap(uintptr_t address, uint32_t size) override
+    void *MemoryMap(uintptr_t address, uint32_t size) override
     {
         UNUSED(address);
         UNUSED(size);
@@ -70,7 +72,6 @@ public:
 
     virtual void Execute() override
     {
-
     }
 };
 

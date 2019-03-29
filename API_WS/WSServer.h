@@ -16,7 +16,7 @@ class WSServer
     typedef websocketpp::server<websocketpp::config::asio> wsserver;
 
     std::shared_ptr<wsserver> _server;
-    uint16_t _port;
+    uint16_t                  _port;
 
     std::shared_ptr<IMessageHandler> _messageHandler;
 
@@ -30,4 +30,4 @@ protected:
     void Setup();
 };
 
-#endif //WSSERVER_H
+#endif // WSSERVER_H

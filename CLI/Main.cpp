@@ -2,8 +2,8 @@
 
 #include "../API_WS/MessageHandler.h"
 
-#include <fstream>
 #include "json/json.hpp"
+#include <fstream>
 using json = nlohmann::json;
 
 int HandleCommandLine(const int& argc, char* argv[], std::string& secondValue)
@@ -11,7 +11,7 @@ int HandleCommandLine(const int& argc, char* argv[], std::string& secondValue)
     switch(argc)
     {
     case 3:
-        argv[3] =  const_cast<char*>("");
+        argv[3] = const_cast<char*>("");
         break;
     case 4:
         argv[4] = const_cast<char*>("");
@@ -32,7 +32,7 @@ int HandleCommandLine(const int& argc, char* argv[], std::string& secondValue)
     return 0;
 }
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
     std::string secondValue = "";
     if(HandleCommandLine(argc, argv, secondValue) == 1)
@@ -44,7 +44,7 @@ int main(int argc, char *argv[])
     messageHandler.AddDaemonRequest("DaemonCLI", argv[1], argv[2], argv[3], argv[4], secondValue);
     std::unique_ptr<DaemonRequestT> req;
     messageHandler.TransferData(req);
-    
+
     std::cout << "--------" << std::endl << "Response" << std::endl;
     std::cout << "Value: " << req.get()->value1 << std::endl;
     std::cout << "Message: " << req.get()->message << std::endl;

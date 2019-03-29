@@ -17,4 +17,4 @@ public:
     void LogFatal(std::string message, std::string file, unsigned int line);
 };
 
-#endif //DEFAULTLOGGER_H
+#endif // DEFAULTLOGGER_H

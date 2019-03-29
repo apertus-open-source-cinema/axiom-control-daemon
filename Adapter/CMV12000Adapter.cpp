@@ -9,7 +9,8 @@ using MemAdapter = MemoryAdapter;
 #endif
 
 #define GETTER_FUNC(A) std::bind(A, this, std::placeholders::_1, std::placeholders::_2)
-#define SETTER_FUNC(A) std::bind(A, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)
+#define SETTER_FUNC(A)                                                                             \
+    std::bind(A, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)
 
 CMV12000Adapter::CMV12000Adapter() :
     address(0x60000000),
@@ -24,9 +25,12 @@ CMV12000Adapter::CMV12000Adapter() :
 
 void CMV12000Adapter::RegisterAvailableMethods()
 {
-    AddParameterHandler("analog_gain", GETTER_FUNC(&CMV12000Adapter::GetAnalogGain), SETTER_FUNC(&CMV12000Adapter::SetAnalogGain));
-    AddParameterHandler("digital_gain", GETTER_FUNC(&CMV12000Adapter::GetDigitalGain), SETTER_FUNC(&CMV12000Adapter::SetDigitalGain));
-    AddParameterHandler("config_register", GETTER_FUNC(&CMV12000Adapter::GetConfigRegister), SETTER_FUNC(&CMV12000Adapter::SetConfigRegister));
+    AddParameterHandler("analog_gain", GETTER_FUNC(&CMV12000Adapter::GetAnalogGain),
+                        SETTER_FUNC(&CMV12000Adapter::SetAnalogGain));
+    AddParameterHandler("digital_gain", GETTER_FUNC(&CMV12000Adapter::GetDigitalGain),
+                        SETTER_FUNC(&CMV12000Adapter::SetDigitalGain));
+    AddParameterHandler("config_register", GETTER_FUNC(&CMV12000Adapter::GetConfigRegister),
+                        SETTER_FUNC(&CMV12000Adapter::SetConfigRegister));
 }
 
 CMV12000Adapter::~CMV12000Adapter()
@@ -34,7 +38,7 @@ CMV12000Adapter::~CMV12000Adapter()
     _memoryAdapter->MemoryUnmap(address, memorySize);
 }
 
-bool CMV12000Adapter::SetAnalogGain(std::string gainValue, std::string, std::string& message)
+bool CMV12000Adapter::SetAnalogGain(std::string gainValue, std::string, std::string &message)
 {
     if(gainValue.length() > 1)
     {
@@ -56,7 +60,7 @@ bool CMV12000Adapter::SetAnalogGain(std::string gainValue, std::string, std::str
     return true;
 }
 
-bool CMV12000Adapter::GetAnalogGain(std::string& gainValue, std::string& message)
+bool CMV12000Adapter::GetAnalogGain(std::string &gainValue, std::string &message)
 {
     UNUSED(message);
 
@@ -88,7 +92,8 @@ bool CMV12000Adapter::GetDigitalGain(std::string &gainValue, std::string &messag
     return true;
 }
 
-bool CMV12000Adapter::SetConfigRegister(const std::string registerIndex, std::string value, std::string &message)
+bool CMV12000Adapter::SetConfigRegister(const std::string registerIndex, std::string value,
+                                        std::string &message)
 {
     UNUSED(message);
 
@@ -103,14 +108,15 @@ bool CMV12000Adapter::GetConfigRegister(std::string &value, std::string &message
 
     // on request: value = register index
     uint16_t val = _memoryAdapter->ReadWord(std::stoi(value));
-    value = std::to_string(val);
+    value        = std::to_string(val);
 
     return true;
 }
 
 void CMV12000Adapter::SetCMVConfigRegister(u_int8_t registerIndex, unsigned int value)
 {
-    std::string message = "SetConfigRegister() - Register: " + std::to_string(registerIndex) + " | Value: " + std::to_string(value);
+    std::string message = "SetConfigRegister() - Register: " + std::to_string(registerIndex) +
+                          " | Value: " + std::to_string(value);
     DAEMON_LOG_INFO(message);
 
     _memoryAdapter->WriteWord(registerIndex, value);

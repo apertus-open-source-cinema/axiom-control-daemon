@@ -15,22 +15,24 @@ class I2CAdapter : public IAdapter
 {
 public:
     I2CAdapter();
-    
+
     void ReadDescriptions(std::string descriptionFile) override
     {
         std::ifstream in(descriptionFile);
         if(!in.is_open())
         {
             std::string errorMessage = "Description file " + descriptionFile + " not found.";
-            syslog (LOG_ERR, "%s", errorMessage.c_str());
+            syslog(LOG_ERR, "%s", errorMessage.c_str());
             return;
         }
 
-        //json j;
-        //in >> j;
+        // json j;
+        // in >> j;
     }
 
-    void CheckDevices() override {}
+    void CheckDevices() override
+    {
+    }
 
     void ReadByte(uint8_t data) override;
     void WriteByte(uint8_t data) override;
@@ -49,4 +51,4 @@ public:
     }
 };
 
-#endif //I2CADAPTER_H
+#endif // I2CADAPTER_H

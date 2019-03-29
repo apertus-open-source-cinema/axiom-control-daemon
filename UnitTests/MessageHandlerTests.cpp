@@ -4,11 +4,13 @@
 
 #include "../API_WS/MessageHandler.h"
 
-//TEST_CASE( "Process message", "[MessageHandler]" )
+// TEST_CASE( "Process message", "[MessageHandler]" )
 //{
-//    std::string inputData = "{ \"id\" : \"gain\", \"value\" : 4, \"type\" : \"ImageSensor\", \"message\" : \"\" }";
+//    std::string inputData = "{ \"id\" : \"gain\", \"value\" : 4, \"type\" : \"ImageSensor\",
+//    \"message\" : \"\" }";
 //    // Alphabetic order, like JSON lib outputs it, also no whitespaces
-//    std::string expectedData = "{\"id\":\"gain\",\"message\":\"OK\",\"type\":\"ImageSensor\",\"value\":4}";
+//    std::string expectedData =
+//    "{\"id\":\"gain\",\"message\":\"OK\",\"type\":\"ImageSensor\",\"value\":4}";
 
 //    std::shared_ptr<IMessageHandler> messageHandler = std::make_shared<MessageHandler>();
 
@@ -21,7 +23,7 @@
 //    REQUIRE( responseMessage == expectedData );
 //}
 
-//TEST_CASE( "Process WS message (new specs)", "[MessageHandler]" )
+// TEST_CASE( "Process WS message (new specs)", "[MessageHandler]" )
 //{
 //    // Reference: http://tomeko.net/online_tools/cpp_text_escape.php?lang=en
 //    std::string inputData = "{ \

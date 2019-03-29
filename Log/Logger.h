@@ -8,23 +8,23 @@ class ILogger;
 // Copied from OpenCine and adjusted
 class Logger final
 {
- private:
-            ILogger* _loggerImplementation;
+private:
+    ILogger* _loggerImplementation;
 
-            Logger();
+    Logger();
 
-    public:
-            Logger(const Logger& rs) = delete;
-            Logger& operator = (const Logger& rs) = delete;
+public:
+    Logger(const Logger& rs) = delete;
+    Logger& operator=(const Logger& rs) = delete;
 
-            static Logger& GetInstance();
+    static Logger& GetInstance();
 
-            ~Logger();
+    ~Logger();
 
-            void LogWarning(std::string message, std::string file, unsigned int line);
-            void LogError(std::string message, std::string file, unsigned int line);
-            void LogInfo(std::string message, std::string file, unsigned int line);
-            void LogFatal(std::string message, std::string file, unsigned int line);
+    void LogWarning(std::string message, std::string file, unsigned int line);
+    void LogError(std::string message, std::string file, unsigned int line);
+    void LogInfo(std::string message, std::string file, unsigned int line);
+    void LogFatal(std::string message, std::string file, unsigned int line);
 };
 
 #define DAEMON_LOG_INFO(message) Logger::GetInstance().LogInfo(message, __FILE__, __LINE__)
@@ -32,4 +32,4 @@ class Logger final
 #define DAEMON_LOG_ERROR(message) Logger::GetInstance().LogError(message, __FILE__, __LINE__)
 #define DAEMON_LOG_FATAL(message) Logger::GetInstance().LogFatal(message, __FILE__, __LINE__)
 
-#endif //LOGGER_H
+#endif // LOGGER_H

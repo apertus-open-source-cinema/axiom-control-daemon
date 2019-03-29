@@ -2,7 +2,7 @@
 
 void DefaultLogger::LogWarning(std::string message, std::string file, unsigned int line)
 {
-   std::clog << "WARNING: " << message << std::endl;
+    std::clog << "WARNING: " << message << std::endl;
 }
 
 void DefaultLogger::LogError(std::string message, std::string file, unsigned int line)

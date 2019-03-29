@@ -1,11 +1,10 @@
 #include "WSServer.h"
 
+using websocketpp::lib::bind;
 using websocketpp::lib::placeholders::_1;
 using websocketpp::lib::placeholders::_2;
-using websocketpp::lib::bind;
 
-WSServer::WSServer(uint16_t port):
-    _messageHandler(std::make_shared<MessageHandler>())
+WSServer::WSServer(uint16_t port) : _messageHandler(std::make_shared<MessageHandler>())
 {
     _port = port;
 
@@ -13,16 +12,16 @@ WSServer::WSServer(uint16_t port):
 }
 
 WSServer::~WSServer()
-{    
+{
 }
 
 void WSServer::Setup()
 {
     _server = std::make_shared<wsserver>();
 
-    auto messageHandler = [&](wsserver* s, websocketpp::connection_hdl hdl, wsserver::message_ptr msg)
-    {
-        //ws->send("ACK", 3, opCode);
+    auto messageHandler = [&](wsserver* s, websocketpp::connection_hdl hdl,
+                              wsserver::message_ptr msg) {
+        // ws->send("ACK", 3, opCode);
         std::string convertedMessage = msg->get_payload();
         std::string responseMessage;
         _messageHandler->ProcessMessage(convertedMessage, responseMessage);
@@ -41,7 +40,7 @@ void WSServer::Setup()
 }
 
 void WSServer::Start()
-{    
+{
     _server->listen(_port);
     _server->start_accept();
     _server->run();
